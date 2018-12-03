@@ -5,8 +5,8 @@
 .container {
   border-radius: 1vh;
   margin: auto;
-  width: 61vh;
-  height: 61vh;
+  width: 60vh;
+  height: 60vh;
   text-align: center;
   display: grid;
   grid-template-columns: repeat(3, 1fr);
