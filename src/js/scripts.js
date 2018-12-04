@@ -2,14 +2,15 @@
   const container = document.getElementById('app');
   container.classList.add('container');
 
-  const stateGame =[];
+  const stateGame = [];
   const quantityCells = 9;
-  let changePlayer = true; 
+  let changePlayer = true;
 
   const createCells = () => {
-    for(let i = 0; i < quantityCells; i++) {
+    for (let i = 0; i < quantityCells; i++) {
       const newCell = {
         id: i,
+        name: '',
       };
       stateGame.push(newCell);
     }
@@ -17,62 +18,76 @@
 
   const renderCells = () => {
     container.innerHTML = '';
-    for(let i = 0; i < quantityCells; i++) {
+    for (let i = 0; i < quantityCells; i++) {
       const gameCell = document.createElement('div');
-      const imgCell = document.createElement('a');
-
       gameCell.classList.add('game__cell');
       container.appendChild(gameCell);
       gameCell.textContent = stateGame[i].name;
-
-      imgCell.classList.add('img__cell');
-      imgCell.dataset.cell = i;
-      gameCell.appendChild(imgCell);
-  
+      gameCell.dataset.cell = i;
     }
   };
   createCells();
   renderCells();
 
   const clearContainer = () => {
-    for(let i = 0; i < quantityCells; i++){
+    for (let i = 0; i < quantityCells; i++) {
       stateGame[i].name = '';
     }
     renderCells();
   };
 
-  const winCombo = () => {
-    let winPlayer = 'X';
-    if(changePlayer){
-      winPlayer = 'O';
+  const showWinner = (winPlayer) => {
+    // eslint-disable-next-line no-alert
+    alert(`Player ${winPlayer} win!!!`);
+    for (let i = 0; i < quantityCells; i++) {
+      if (stateGame[i].name === '') {
+        stateGame[i].name = ' ';
+      }
     }
-    if ((winPlayer === stateGame[0].name && winPlayer === stateGame[1].name && winPlayer === stateGame[2].name) ||
-      (winPlayer === stateGame[3].name && winPlayer === stateGame[4].name && winPlayer === stateGame[5].name) ||
-      (winPlayer === stateGame[6].name && winPlayer === stateGame[7].name && winPlayer === stateGame[8].name) ||
-      (winPlayer === stateGame[0].name && winPlayer === stateGame[3].name && winPlayer === stateGame[6].name) ||
-      (winPlayer === stateGame[1].name && winPlayer === stateGame[4].name && winPlayer === stateGame[7].name) ||
-      (winPlayer === stateGame[2].name && winPlayer === stateGame[5].name && winPlayer === stateGame[8].name) ||
-      (winPlayer === stateGame[0].name && winPlayer === stateGame[4].name && winPlayer === stateGame[8].name) ||
-      (winPlayer === stateGame[2].name && winPlayer === stateGame[4].name && winPlayer === stateGame[6].name)) {
-        alert ('Player ' + winPlayer + ' win!!!');
-        clearContainer();
-    }    
+  };
+
+  const winCombo = () => {
+    const winTemplates = ['012', '345', '678', '036', '147', '258', '048', '246'];
+    let winPlayer = '';
+    let comboX = '';
+    let comboO = '';
+    for (let i = 0; i < quantityCells; i++) {
+      if (stateGame[i].name === 'X') {
+        comboX += i;
+      }
+      if (stateGame[i].name === 'O') {
+        comboO += i;
+      }
+    }
+
+    for (let i = 0; i < winTemplates.length; i++) {
+      if (comboX.indexOf(winTemplates[i]) > -1) {
+        winPlayer = 'X';
+        break;
+      }
+      if (comboO.indexOf(winTemplates[i]) > -1) {
+        winPlayer = 'O';
+        break;
+      }
+    }
+    if (winPlayer !== '') {
+      showWinner(winPlayer);
+    }
   };
 
   container.addEventListener('click', (e) => {
-    if(e.target.classList.value === 'game__cell') {
-      const targetImage = e.target.childNodes[0].dataset.cell;
-      for(let i = 0; i < quantityCells; i++){
-        if(stateGame[i].id == targetImage){
-          if(changePlayer){ 
+    if (e.target.classList.value === 'game__cell') {
+      const targetImage = e.target.dataset.cell;
+      for (let i = 0; i < quantityCells; i++) {
+        if (stateGame[i].id == targetImage && stateGame[i].name === '') {
+          if (changePlayer) {
             changePlayer = false;
             stateGame[i].name = 'X';
-            setTimeout(winCombo, 0);
           } else {
             changePlayer = true;
             stateGame[i].name = 'O';
-            setTimeout(winCombo, 0);
           }
+          setTimeout(winCombo, 0);
         }
       }
     }
