@@ -34,48 +34,55 @@
       stateGame[i].name = '';
     }
     renderCells();
+    container.addEventListener('click', containerListener);
   };
 
   const showWinner = (winPlayer) => {
-    // eslint-disable-next-line no-alert
-    alert(`Player ${winPlayer} win!!!`);
     for (let i = 0; i < quantityCells; i++) {
       if (stateGame[i].name === '') {
         stateGame[i].name = ' ';
       }
     }
+    // eslint-disable-next-line no-alert
+    alert(`Player ${winPlayer} win!!!`);
   };
+
+  const isFull = () => stateGame.every(item => item.name !== '');
 
   const winCombo = () => {
     const winTemplates = ['012', '345', '678', '036', '147', '258', '048', '246'];
-    let winPlayer = '';
-    let comboX = '';
-    let comboO = '';
+    let player = 'X';
+    if (changePlayer === true) {
+      player = 'O';
+    }
+    let combo = '';
     for (let i = 0; i < quantityCells; i++) {
-      if (stateGame[i].name === 'X') {
-        comboX += i;
-      }
-      if (stateGame[i].name === 'O') {
-        comboO += i;
+      if (stateGame[i].name === player) {
+        combo += i;
       }
     }
-
+    let winPlayer = '';
     for (let i = 0; i < winTemplates.length; i++) {
-      if (comboX.indexOf(winTemplates[i]) > -1) {
-        winPlayer = 'X';
-        break;
-      }
-      if (comboO.indexOf(winTemplates[i]) > -1) {
-        winPlayer = 'O';
-        break;
+      let count = 0;
+      for (let j = 0; j < winTemplates[i].length; j++) {
+        if (combo.indexOf(winTemplates[i][j]) > -1) {
+          count++;
+        }
+        if (count === 3) {
+          winPlayer = player;
+          showWinner(winPlayer);
+          container.removeEventListener('click', containerListener);
+          break;
+        }
       }
     }
-    if (winPlayer !== '') {
-      showWinner(winPlayer);
+    if (isFull() && winPlayer === '') {
+      alert('Draw!!!');
+      container.removeEventListener('click', containerListener);
     }
   };
 
-  container.addEventListener('click', (e) => {
+  function containerListener(e) {
     if (e.target.classList.value === 'game__cell') {
       const targetImage = e.target.dataset.cell;
       for (let i = 0; i < quantityCells; i++) {
@@ -83,16 +90,21 @@
           if (changePlayer) {
             changePlayer = false;
             stateGame[i].name = 'X';
+            renderCells();
+            break;
           } else {
             changePlayer = true;
             stateGame[i].name = 'O';
+            renderCells();
+            break;
           }
-          setTimeout(winCombo, 0);
         }
       }
     }
     renderCells();
-  });
+    setTimeout(winCombo, 0);
+  }
+  container.addEventListener('click', containerListener);
 
   const buttonRestart = document.createElement('button');
   buttonRestart.classList.add('button__restart');
